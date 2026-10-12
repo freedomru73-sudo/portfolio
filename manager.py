@@ -5,19 +5,23 @@ import os
 import re
 import webbrowser
 
+# Убраны лишние пробелы в концах строк, добавлены категории для Фото
 DEFAULT_DATA = {
- "Видео": {
- "Бьюти": [],  "Реклама": [],  "Обычные рилсы": [],  "Машины": [],
- "Подкасты": [],  "АЕ-плашки": [],  "Дрон": [],  "Художественный": []
-},
- "Фото": {
- "Свадьбы": [],  "Интервью": []
-}
+    "Видео": {
+        "Бьюти": [], "Реклама": [], "Обычные рилсы": [], "Машины": [],
+        "Подкасты": [], "АЕ-плашки": [], "Дрон": [], "Художественный": []
+    },
+    "Фото": {
+        "Свадьбы": [], "Интервью": [], "Портреты": [], 
+        "Репортаж": [], "Предметная съемка": [], "Love Story": [], "Бьюти": []
+    }
 }
 
 DEFAULT_REVIEWS = [
-{ "text": "«Отличный монтаж, всё сделано быстро и качественно.»",  "author": "— Анна, Владелец бьюти-студии"},
-{ "text": "«Профессиональный подход и красивый результат.»",  "author": "— Сергей, Автоспорт"}
+    {"text": "«Отличный монтаж, всё сделано быстро и качественно. Видео набрало в 3 раза больше просмотров, чем обычно.»", "author": "— Анна, Владелец бьюти-студии"},
+    {"text": "«Профессиональный подход и красивый результат. Понял задачу с полуслова, предложил свои идеи по динамике.»", "author": "— Сергей, Автоспорт и Детейлинг"},
+    {"text": "«Работаем на постоянной основе уже полгода. Всегда креативные решения и соблюдение дедлайнов.»", "author": "— Маркетинг-директор, Компания «КИФТОН»"},
+    {"text": "«Делали интервью и подкаст. Картинка сочная, переходы плавные, плашки стильные.»", "author": "— Руслан, Продюсер подкастов"}
 ]
 
 class PortfolioManager:
@@ -119,11 +123,9 @@ class PortfolioManager:
             with open(self.script_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            # Пытаемся заменить по маркерам
             pattern = r"// === PORTFOLIO DATA START ===[\s\S]*?// === PORTFOLIO DATA END ==="
             new_content, count = re.subn(pattern, new_block, content)
             
-            # Если маркеров не было, заменяем сам объект
             if count == 0:
                 pattern2 = r"const portfolioData\s*=\s*\{[\s\S]*?\};"
                 new_content = re.sub(pattern2, new_block, content)
@@ -182,7 +184,7 @@ class PortfolioManager:
         notebook = ttk.Notebook(self.root)
         notebook.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 12))
 
-        # ==================== ВКЛАДКА ПОРТФОЛИО ====================
+        # === ВКЛАДКА ПОРТФОЛИО ===
         tab_portfolio = ttk.Frame(notebook, padding="12")
         notebook.add(tab_portfolio, text="📁 Портфолио")
 
@@ -195,8 +197,8 @@ class PortfolioManager:
         self.tree.heading("sub", text="Подкатегория")
         self.tree.heading("name", text="Название")
         self.tree.heading("path", text="Ссылка")
-        self.tree.column("cat", width=90)
-        self.tree.column("sub", width=110)
+        self.tree.column("cat", width=100)
+        self.tree.column("sub", width=120)
         self.tree.column("name", width=180)
         self.tree.column("path", width=260)
         
@@ -205,12 +207,12 @@ class PortfolioManager:
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
 
-        right = ttk.LabelFrame(tab_portfolio, text="Добавить видео/фото", padding="12")
+        right = ttk.LabelFrame(tab_portfolio, text="Добавить работу", padding="12")
         right.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # Убрали state="readonly", чтобы можно было вписывать новые категории
         ttk.Label(right, text="Категория (можно ввести новую):").grid(row=0, column=0, sticky=tk.W, pady=4)
         self.cat_var = tk.StringVar()
-        # УБРАЛИ state="readonly", чтобы можно было добавлять новые главные категории
         self.cat_cb = ttk.Combobox(right, textvariable=self.cat_var, width=28)
         self.cat_cb.grid(row=0, column=1, sticky=tk.EW, pady=4)
 
@@ -242,12 +244,51 @@ class PortfolioManager:
         self.cat_cb.bind("<<ComboboxSelected>>", self.update_subs)
         self.tree.bind("<Double-1>", self.on_double_click)
 
-        # ==================== ВКЛАДКА ОТЗЫВЫ ====================
-        # (Код отзывов оставлен без изменений для краткости, он работает корректно)
+        # === ВКЛАДКА ОТЗЫВЫ ===
         tab_reviews = ttk.Frame(notebook, padding="12")
         notebook.add(tab_reviews, text="💬 Отзывы")
-        # ... [Здесь ваш существующий код для вкладки отзывов] ...
 
+        rev_left = ttk.LabelFrame(tab_reviews, text="Текущие отзывы", padding="8")
+        rev_left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 8))
+
+        rev_cols = ("text", "author")
+        self.rev_tree = ttk.Treeview(rev_left, columns=rev_cols, show="headings", selectmode="browse")
+        self.rev_tree.heading("text", text="Текст отзыва")
+        self.rev_tree.heading("author", text="Автор")
+        self.rev_tree.column("text", width=450)
+        self.rev_tree.column("author", width=200)
+
+        rev_sb = ttk.Scrollbar(rev_left, orient=tk.VERTICAL, command=self.rev_tree.yview)
+        self.rev_tree.configure(yscroll=rev_sb.set)
+        self.rev_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        rev_sb.pack(side=tk.RIGHT, fill=tk.Y)
+
+        rev_right = ttk.LabelFrame(tab_reviews, text="Добавить отзыв", padding="12")
+        rev_right.pack(side=tk.RIGHT, fill=tk.Y)
+
+        ttk.Label(rev_right, text="Текст отзыва:").grid(row=0, column=0, sticky=tk.W, pady=4)
+        self.rev_text_var = tk.StringVar()
+        ttk.Entry(rev_right, textvariable=self.rev_text_var, width=35).grid(row=0, column=1, sticky=tk.EW, pady=4)
+
+        ttk.Label(rev_right, text="Автор:").grid(row=1, column=0, sticky=tk.W, pady=4)
+        self.rev_author_var = tk.StringVar()
+        ttk.Entry(rev_right, textvariable=self.rev_author_var, width=35).grid(row=1, column=1, sticky=tk.EW, pady=4)
+
+        rev_btns = ttk.Frame(rev_right)
+        rev_btns.grid(row=2, column=0, columnspan=2, sticky=tk.EW, pady=12)
+        ttk.Button(rev_btns, text="➕ Добавить", command=self.add_review).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 4))
+        ttk.Button(rev_btns, text="🗑 Удалить", command=self.delete_review).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+        ttk.Button(rev_right, text="🧹 Очистить форму", command=self.clear_review_form).grid(row=3, column=0, columnspan=2, sticky=tk.EW)
+
+        rev_right.columnconfigure(1, weight=1)
+        rev_btns.columnconfigure(0, weight=1)
+        rev_btns.columnconfigure(1, weight=1)
+
+        self.rev_tree.bind("<Double-1>", self.on_rev_double_click)
+
+    # ============================================================
+    # ЛОГИКА ПОРТФОЛИО
+    # ============================================================
     def update_subs(self, _=None):
         cat = self.cat_var.get().strip()
         if cat in self.data:
@@ -257,7 +298,8 @@ class PortfolioManager:
             self.sub_cb['values'] = []
 
     def refresh_tree(self):
-        for i in self.tree.get_children(): self.tree.delete(i)
+        for i in self.tree.get_children():
+            self.tree.delete(i)
         for cat, subs in self.data.items():
             for sub, items in subs.items():
                 for it in items:
@@ -278,7 +320,7 @@ class PortfolioManager:
 
         if cat not in self.data:
             self.data[cat] = {}
-            self.cat_cb['values'] = list(self.data.keys()) # Обновляем список
+            self.cat_cb['values'] = list(self.data.keys())
             
         if sub not in self.data[cat]:
             self.data[cat][sub] = []
@@ -303,7 +345,9 @@ class PortfolioManager:
                 self.refresh_tree()
 
     def clear_form(self):
-        self.name_var.set(""); self.path_var.set(""); self.sub_var.set("")
+        self.name_var.set("")
+        self.path_var.set("")
+        self.sub_var.set("")
 
     def on_double_click(self, _):
         sel = self.tree.selection()
@@ -315,6 +359,57 @@ class PortfolioManager:
         self.name_var.set(str(v[2]).strip())
         self.path_var.set(str(v[3]).strip())
 
+    # ============================================================
+    # ЛОГИКА ОТЗЫВОВ
+    # ============================================================
+    def refresh_reviews(self):
+        for i in self.rev_tree.get_children():
+            self.rev_tree.delete(i)
+        for r in self.reviews:
+            text_short = r["text"][:80] + "..." if len(r["text"]) > 80 else r["text"]
+            self.rev_tree.insert("", tk.END, values=(text_short, r["author"]))
+
+    def add_review(self):
+        text = self.rev_text_var.get().strip()
+        author = self.rev_author_var.get().strip()
+        if not all([text, author]):
+            messagebox.showwarning("Внимание", "Заполните текст и автора!")
+            return
+        if not text.startswith("«"): text = "«" + text
+        if not text.endswith("»"): text = text + "»"
+        if not author.startswith("—"): author = "— " + author
+        self.reviews.append({"text": text, "author": author})
+        self.refresh_reviews()
+        self.clear_review_form()
+        messagebox.showinfo("Готово", "Отзыв добавлен.\nНажмите 💾 Сохранить всё.")
+
+    def delete_review(self):
+        sel = self.rev_tree.selection()
+        if not sel:
+            messagebox.showwarning("Внимание", "Выберите отзыв в таблице!")
+            return
+        idx = self.rev_tree.index(sel[0])
+        if messagebox.askyesno("Подтверждение", "Удалить этот отзыв?"):
+            if 0 <= idx < len(self.reviews):
+                self.reviews.pop(idx)
+                self.refresh_reviews()
+
+    def clear_review_form(self):
+        self.rev_text_var.set("")
+        self.rev_author_var.set("")
+
+    def on_rev_double_click(self, _):
+        sel = self.rev_tree.selection()
+        if not sel: return
+        idx = self.rev_tree.index(sel[0])
+        if 0 <= idx < len(self.reviews):
+            r = self.reviews[idx]
+            self.rev_text_var.set(r["text"])
+            self.rev_author_var.set(r["author"])
+
+    # ============================================================
+    # ОТКРЫТИЕ БРАУЗЕРА
+    # ============================================================
     def open_browser(self):
         self.save_all()
         if os.path.exists(self.html_path):

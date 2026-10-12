@@ -4,30 +4,37 @@
 // === PORTFOLIO DATA START ===
 const portfolioData = {
  "Видео": {
- "Бьюти": [],
- "Реклама": [],
- "Обычные рилсы": [],
- "Машины": [
-    {
-     "name": "Dada",
-     "path": "https://disk.yandex.ru/i/2iG3UfwlYwKA8g"
-    }
- ],
- "Подкасты": [],
- "АЕ-плашки": [],
- "Дрон": [],
- "Художественный": []
-},
+  "Бьюти": [],
+  "Реклама": [],
+  "Обычные рилсы": [],
+  "Машины": [
+   {
+    "name": "Dada",
+    "path": "https://disk.yandex.ru/i/2iG3UfwlYwKA8g"
+   }
+  ],
+  "Подкасты": [],
+  "АЕ-плашки": [],
+  "Дрон": [],
+  "Художественный": []
+ },
  "Фото": {
- "Свадьбы": [],
- "Интервью": []
-}
+  "Свадьбы": [],
+  "Интервью": [
+   {
+    "name": "1",
+    "path": "https://disk.yandex.ru/i/pP2s-CibZ3ziYw"
+   }
+  ],
+  "Портреты": [],
+  "Репортаж": [],
+  "Предметная съемка": [],
+  "Love Story": [],
+  "Бьюти": []
+ }
 };
 // === PORTFOLIO DATA END ===
 
-// =========================================================
-// FALLBACK THUMBNAIL & FETCH (Без изменений)
-// =========================================================
 const fallbackThumbnail = "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80";
 const CORS_PROXY = "https://corsproxy.io/?";
 
@@ -65,10 +72,6 @@ async function fetchThumbnail(path) {
  }
 }
 
-function isVideoFile(path) {
- return typeof path === "string" && path.startsWith("http") && !/.(jpg|jpeg|png|webp|gif|heic)$/i.test(path);
-}
-
 function showFileError(item) {
  const modal = document.getElementById("media-modal");
  const modalBody = document.getElementById("modal-body");
@@ -88,13 +91,13 @@ function showFileError(item) {
 }
 
 // =========================================================
-// СОЗДАНИЕ ПОРТФОЛИО (НОВАЯ ЛОГИКА С ПЕРЕКЛЮЧАТЕЛЕМ)
+// СОЗДАНИЕ ПОРТФОЛИО
 // =========================================================
 const accordionContainer = document.getElementById("portfolio-accordion");
 const toggleContainer = document.getElementById("portfolio-toggle");
 
 if (accordionContainer && toggleContainer) {
-    // 1. Генерация кнопок-переключателей (Видео / Фото)
+    // 1. Генерация кнопок-переключателей
     const mainCategories = Object.keys(portfolioData);
     mainCategories.forEach((cat, index) => {
         const btn = document.createElement("button");
@@ -104,9 +107,9 @@ if (accordionContainer && toggleContainer) {
         toggleContainer.appendChild(btn);
     });
 
-    // 2. Функция рендера аккордеона для выбранной категории
+    // 2. Функция рендера аккордеона
     function renderAccordion(mainCategory) {
-        accordionContainer.innerHTML = ""; // Очищаем предыдущие
+        accordionContainer.innerHTML = "";
         const subCategories = portfolioData[mainCategory];
         if (!subCategories) return;
 
@@ -120,7 +123,6 @@ if (accordionContainer && toggleContainer) {
             header.type = "button";
             header.className = "accordion-header";
             header.setAttribute("aria-expanded", "false");
-            // Теперь показываем только подкатегорию, так как главная уже выбрана сверху
             header.innerHTML = `
                 <span>${subCategory}</span>
                 <span style="display:flex; align-items:center; gap:10px; font-weight:400; font-size:14px; color:#666;">
@@ -137,7 +139,6 @@ if (accordionContainer && toggleContainer) {
             items.forEach(item => {
                 const card = document.createElement("div");
                 card.className = "media-card";
-                const isVideo = isVideoFile(item.path);
                 
                 const img = document.createElement("img");
                 img.src = fallbackThumbnail;
@@ -150,11 +151,9 @@ if (accordionContainer && toggleContainer) {
                 const title = document.createElement("div");
                 title.className = "media-card-title";
                 
-                if (isVideo) {
-                    title.innerHTML = `<div class="play-icon"><i class="fa-solid fa-play"></i></div> ${item.name}`;
-                } else {
-                    title.textContent = item.name;
-                }
+                // Иконка будет обновлена после проверки типа файла, пока ставим универсальную
+                title.innerHTML = `<div class="play-icon"><i class="fa-solid fa-eye"></i></div> ${item.name}`;
+                
                 overlay.appendChild(title);
                 card.appendChild(img);
                 card.appendChild(overlay);
@@ -163,18 +162,31 @@ if (accordionContainer && toggleContainer) {
                     if (thumbnail && typeof thumbnail === "string") img.src = thumbnail;
                 }).catch(() => {});
 
+                // === ГЛАВНОЕ ИСПРАВЛЕНИЕ: ОПРЕДЕЛЕНИЕ ТИПА ФАЙЛА ПО ИМЕНИ С ЯНДЕКС ДИСКА ===
                 card.addEventListener("click", async () => {
                     try {
                         card.style.pointerEvents = "none";
                         card.style.opacity = "0.65";
+                        
+                        // 1. Получаем метаданные, чтобы узнать реальное имя файла (например, "photo.jpg" или "video.mp4")
+                        const data = await getYandexData(item.path);
+                        const fileName = data.name || "";
+                        
+                        // 2. Проверяем расширение реального файла
+                        const isVideo = /\.(mp4|mov|avi|mkv|webm|m4v)$/i.test(fileName);
+
                         if (isVideo) {
+                            // Обновляем иконку на плеер
+                            title.innerHTML = `<div class="play-icon"><i class="fa-solid fa-play"></i></div> ${item.name}`;
                             const videoUrl = await getYandexDownloadUrl(item.path);
-                            openModal({ type: "video", url: videoUrl, poster: img.src, name: item.name });
+                            openModal({ type: "video", url: videoUrl, poster: data.preview || img.src, name: item.name });
                         } else {
-                            const data = await getYandexData(item.path);
+                            // Это фото
+                            title.innerHTML = `<div class="play-icon"><i class="fa-solid fa-image"></i></div> ${item.name}`;
                             openModal({ type: "image", url: data.file || data.preview, poster: data.preview, name: item.name });
                         }
                     } catch (error) {
+                        console.error("Ошибка открытия:", error);
                         showFileError(item);
                     } finally {
                         card.style.pointerEvents = "";
@@ -221,12 +233,12 @@ if (accordionContainer && toggleContainer) {
         }
     });
 
-    // 4. Первоначальный рендер (по умолчанию первая категория)
+    // 4. Первоначальный рендер
     renderAccordion(mainCategories[0]);
 }
 
 // =========================================================
-// MODAL & MOBILE MENU & REVEAL (Без изменений)
+// MODAL & MOBILE MENU & REVEAL
 // =========================================================
 const modal = document.getElementById("media-modal");
 const modalBody = document.getElementById("modal-body");
