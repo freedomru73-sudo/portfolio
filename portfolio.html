@@ -3,276 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-
     <title>Портфолио — BRAGIN MEDIA</title>
-
     <link rel="stylesheet" href="style.css">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
-
-    <style>
-
-        html, body { max-width: 100%; overflow-x: hidden; }
-        * { box-sizing: border-box; }
-
-        .mobile-menu-toggle { display: none; }
-
-        @media (max-width: 768px) {
-
-            header {
-                position: sticky !important; top: 0 !important; left: 0 !important;
-                z-index: 99999 !important; width: 100% !important;
-                min-height: 64px !important;
-                display: flex !important; align-items: center !important;
-                justify-content: space-between !important;
-                padding: 10px 16px !important;
-                background: rgba(255,255,255,0.97) !important;
-                backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-                border-bottom: 1px solid rgba(0,0,0,0.08);
-            }
-
-            header .logo { display: flex; align-items: center; width: auto; height: 170px; }
-            header .logo img {
-                display: block; width: 170px !important; height: 170px !important;
-                object-fit: contain;
-            }
-
-            .mobile-menu-toggle {
-                display: flex !important; align-items: center; justify-content: center;
-                width: 44px !important; height: 44px !important; flex: 0 0 44px;
-                padding: 0 !important; margin: 0 !important;
-                border: 1px solid rgba(0,0,0,0.14) !important;
-                border-radius: 11px !important;
-                background: #ffffff !important; color: #000000 !important;
-                font-size: 18px !important; cursor: pointer;
-                appearance: none; -webkit-appearance: none;
-                transition: transform 0.2s ease, background 0.2s ease;
-            }
-            .mobile-menu-toggle:active { transform: scale(0.94); }
-
-            header nav {
-                position: absolute !important;
-                top: 100% !important; left: 0 !important; right: 0 !important;
-                width: 100% !important; display: none !important;
-                flex-direction: column !important; align-items: stretch !important;
-                padding: 10px 14px 16px !important; margin: 0 !important;
-                background: #ffffff !important;
-                border-top: 1px solid rgba(0,0,0,0.06);
-                box-shadow: 0 16px 35px rgba(0,0,0,0.10);
-                max-height: calc(100vh - 64px); overflow-y: auto;
-            }
-            header nav.mobile-open { display: flex !important; }
-
-            header nav a {
-                display: flex !important; align-items: center !important;
-                width: 100% !important; padding: 14px !important; margin: 0 !important;
-                border-radius: 10px; font-size: 14px !important; line-height: 1.3;
-                text-decoration: none;
-            }
-            header nav a + a { margin-top: 2px !important; }
-            header nav a:hover { background: rgba(0,0,0,0.045); }
-            header nav a.active { background: rgba(0,0,0,0.06); }
-
-            .nav-icon { width: 20px; margin-right: 9px !important; text-align: center; }
-
-            header nav .button-nav {
-                justify-content: center !important; margin-top: 7px !important;
-                background: #000000 !important; color: #ffffff !important;
-            }
-
-            .section { width: 100% !important; padding: 52px 16px !important; overflow: hidden; }
-            .section-header { width: 100%; margin-bottom: 30px; }
-            .section-header h2 {
-                font-size: 32px !important; line-height: 1.05 !important; margin-bottom: 12px;
-            }
-            .section-header p {
-                font-size: 14px !important; line-height: 1.55 !important; max-width: 100%;
-            }
-
-            #portfolio-accordion {
-                width: 100%; display: flex; flex-direction: column; gap: 12px;
-            }
-            .accordion { width: 100%; }
-            .accordion-item { width: 100%; }
-            .accordion-header {
-                width: 100% !important; min-height: 58px;
-                padding: 15px 16px !important;
-                display: flex !important; align-items: center !important;
-                justify-content: space-between !important; gap: 12px;
-                border-radius: 13px !important;
-            }
-            .accordion-header span {
-                min-width: 0; font-size: 14px !important; line-height: 1.3; text-align: left;
-            }
-            .accordion-header i { flex: 0 0 auto; }
-
-            .accordion-content { width: 100% !important; padding: 12px 0 3px !important; }
-
-            .portfolio-grid, .video-grid, .gallery-grid {
-                width: 100% !important; display: grid !important;
-                grid-template-columns: 1fr !important; gap: 14px !important;
-            }
-
-            .portfolio-card, .video-card, .media-card {
-                width: 100% !important; min-width: 0 !important;
-            }
-            .portfolio-card img, .video-card img, .media-card img {
-                width: 100% !important; height: auto !important;
-                display: block; object-fit: cover;
-            }
-
-            .modal { padding: 10px !important; }
-            .modal-content {
-                width: 100% !important; max-width: 100% !important;
-                margin: auto; padding: 8px !important; border-radius: 14px !important;
-            }
-            .modal-close {
-                top: 8px !important; right: 8px !important; z-index: 10;
-                width: 38px; height: 38px;
-                display: flex; align-items: center; justify-content: center;
-            }
-            #modal-body video {
-                width: 100% !important; max-width: 100% !important;
-                max-height: 80vh !important; display: block; border-radius: 10px !important;
-            }
-
-            footer {
-                padding: 22px 14px !important; text-align: center;
-                font-size: 11px; line-height: 1.5;
-            }
-        }
-
-        @media (max-width: 380px) {
-            header { padding-left: 12px !important; padding-right: 12px !important; }
-            .section { padding-left: 12px !important; padding-right: 12px !important; }
-            .section-header h2 { font-size: 29px !important; }
-            .accordion-header { padding: 13px !important; }
-        }
-
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
+    <header>
+        <a href="index.html" class="logo">BRAGIN <span>MEDIA</span></a>
+        <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-checkbox">
+        <label for="mobile-menu-toggle" class="mobile-menu-button">
+            <span></span><span></span><span></span>
+        </label>
+        <nav id="main-nav">
+            <a href="index.html">Главная</a>
+            <a href="portfolio.html" class="active">Портфолио</a>
+            <a href="index.html#about">Обо мне</a>
+            <a href="index.html#reviews">Отзывы</a>
+            <a href="index.html#contact" class="button-nav">Связаться</a>
+        </nav>
+    </header>
 
-<header>
+    <main>
+        <section class="section bg-light" id="portfolio">
+            <div class="section-header">
+                <h2>Портфолио</h2>
+                <p>Выберите тип работ, чтобы посмотреть категории и проекты.</p>
+            </div>
+            
+            <!-- Переключатель Видео / Фото -->
+            <div class="portfolio-toggle" id="portfolio-toggle">
+                <!-- Кнопки генерируются через JS -->
+            </div>
 
-    <div class="logo">
-        <img src="logo.png" height="160" width="160" alt="BRAGIN MEDIA">
-    </div>
+            <div class="accordion" id="portfolio-accordion">
+                <!-- Аккордеон генерируется через JS -->
+            </div>
+        </section>
+    </main>
 
-    <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-checkbox">
-
-    <label for="mobile-menu-toggle" class="mobile-menu-button" aria-label="Открыть меню">
-        <span></span>
-        <span></span>
-        <span></span>
-    </label>
-
-    <nav id="main-nav">
-        <a href="index.html">
-            <i class="fa-solid fa-house nav-icon"></i> Главная
-        </a>
-        <a href="portfolio.html" class="active">
-            <i class="fa-solid fa-film nav-icon"></i> Портфолио
-        </a>
-        <a href="index.html#about">
-            <i class="fa-solid fa-user nav-icon"></i> Обо мне
-        </a>
-        <a href="index.html#reviews">
-            <i class="fa-solid fa-star nav-icon"></i> Отзывы
-        </a>
-        <a href="index.html#contact" class="button-nav">
-            <i class="fa-solid fa-paper-plane nav-icon"></i> Связаться
-        </a>
-    </nav>
-
-</header>
-
-<main>
-
-    <section class="section">
-
-        <div class="section-header">
-            <h2><i class="fa-solid fa-film"></i> Портфолио</h2>
-            <p style="color: var(--text-muted); font-size: 18px;">
-                Выберите категорию. Обложки загружаются автоматически из Яндекс.Диска.
-            </p>
+    <!-- Модальное окно -->
+    <div id="media-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-body"></div>
         </div>
-
-        <div id="portfolio-accordion" class="accordion"></div>
-
-    </section>
-
-</main>
-
-<footer>
-    <i class="fa-regular fa-copyright"></i>
-    2026 BRAGIN MEDIA. Все права защищены.
-</footer>
-
-<div id="media-modal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <div id="modal-body"></div>
     </div>
-</div>
 
-<script src="script.js"></script>
+    <footer>
+        <p>© 2026 BRAGIN MEDIA. Все права защищены.</p>
+    </footer>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const mobileToggle = document.getElementById("mobile-menu-toggle");
-        const mainNav = document.getElementById("main-nav");
-
-        if (!mobileToggle || !mainNav) return;
-
-        mobileToggle.addEventListener("click", function (event) {
-            event.stopPropagation();
-
-            const isOpen = mainNav.classList.toggle("mobile-open");
-
-            mobileToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-            mobileToggle.setAttribute("aria-label", isOpen ? "Закрыть меню" : "Открыть меню");
-            mobileToggle.innerHTML = isOpen
-                ? '<i class="fa-solid fa-xmark"></i>'
-                : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        mainNav.querySelectorAll("a").forEach(function (link) {
-            link.addEventListener("click", function () {
-                mainNav.classList.remove("mobile-open");
-                mobileToggle.setAttribute("aria-expanded", "false");
-                mobileToggle.setAttribute("aria-label", "Открыть меню");
-                mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
-            });
-        });
-
-        document.addEventListener("click", function (event) {
-            if (!mainNav.contains(event.target) && !mobileToggle.contains(event.target)) {
-                mainNav.classList.remove("mobile-open");
-                mobileToggle.setAttribute("aria-expanded", "false");
-                mobileToggle.setAttribute("aria-label", "Открыть меню");
-                mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
-            }
-        });
-
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
-                mainNav.classList.remove("mobile-open");
-                mobileToggle.setAttribute("aria-expanded", "false");
-                mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
-            }
-        });
-    });
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
